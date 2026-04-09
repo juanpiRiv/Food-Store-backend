@@ -1,4 +1,6 @@
 package org.example.enums;
 
-public class Rol {
+public enum Rol {
+    ADMIN,
+    USUARIO
 }
