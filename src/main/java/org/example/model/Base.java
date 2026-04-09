@@ -19,6 +19,7 @@ public abstract class Base {
     this.eliminado = false;
     this.createdAt = LocalDateTime.now();
     }
+
     public Long getId() {
     return id;
     }
