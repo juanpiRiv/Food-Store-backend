@@ -1,4 +1,9 @@
 package org.example.enums;
 
-public class FormaPago {
+package org.example.enums;
+
+public enum FormaPago {
+    TARJETA,
+    TRANSFERENCIA,
+    EFECTIVO
 }

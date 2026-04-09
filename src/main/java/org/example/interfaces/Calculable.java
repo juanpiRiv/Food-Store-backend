@@ -1,4 +1,6 @@
 package org.example.interfaces;
 
-public class Calculable {
+
+public interface Calculable {
+    double calcularTotal();
 }

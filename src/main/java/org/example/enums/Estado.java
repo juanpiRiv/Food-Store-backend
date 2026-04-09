@@ -1,4 +1,8 @@
 package org.example.enums;
 
-public class Estado {
+public enum Estado {
+    PENDIENTE,
+    CONFIRMADO,
+    TERMINADO,
+    CANCELADO
 }
