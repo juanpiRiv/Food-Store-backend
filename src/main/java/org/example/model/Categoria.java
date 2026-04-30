@@ -1,55 +1,35 @@
 package org.example.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
+@Getter
+@Setter
+@ToString(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 public class Categoria extends Base {
 
+    @EqualsAndHashCode.Include
     private String nombre;
+
     private String descripcion;
-    private Set<Producto> productos;
 
-    // cstrctor vacío
-    public Categoria() {
-        super();
-        this.productos = new HashSet<>();
-    }
+    @Builder.Default
+    @ToString.Exclude
+    private Set<Producto> productos = new HashSet<>();
 
-    // cstrctor con params
-    public Categoria(Long id, String nombre, String descripcion) {
-        super(id);
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.productos = new HashSet<>();
-    }
-
-    // Getters y setters
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public Set<Producto> getProductos() {
-        return productos;
-    }
-
-    public void setProductos(Set<Producto> productos) {
-        this.productos = productos;
-    }
-
-    // metodos de negocio
     public void agregarProducto(Producto producto) {
         if (producto != null) {
             productos.add(producto);
@@ -58,30 +38,5 @@ public class Categoria extends Base {
 
     public void eliminarProducto(Producto producto) {
         productos.remove(producto);
-    }
-
-    // toString
-    @Override
-    public String toString() {
-        return "Categoria{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", descripcion='" + descripcion + '\'' +
-                ", cantidadProductos=" + productos.size() +
-                '}';
-    }
-
-    // equals
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Categoria categoria)) return false;
-        return Objects.equals(nombre, categoria.nombre);
-    }
-
-    // hashCode
-    @Override
-    public int hashCode() {
-        return Objects.hash(nombre);
     }
 }
