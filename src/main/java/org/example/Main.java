@@ -21,6 +21,10 @@ public class Main {
         mostrarPedidosDelUsuarioConMasPedidos(usuarios);
         compararProductoNuevoConColeccion(productos);
         mostrarUsuarioDTO(usuarios);
+
+        mostrarProductosDisponibles(productos);
+        mostrarCantidadItemsDeUnPedido(usuarios);
+        mostrarProductosConStockMenorA5(productos);
     }
 
     public static void mostrarUnProducto(Set<Producto> productos) {
@@ -119,6 +123,44 @@ public class Main {
             System.out.println(usuarioDTO);
             break;
         }
+
+        System.out.println();
+    }
+
+    public static void mostrarProductosDisponibles(Set<Producto> productos) {
+        System.out.println("=== PRODUCTOS DISPONIBLES ===");
+
+        productos.stream()
+                .filter(Producto::isDisponible)
+                .forEach(producto -> System.out.println(producto.toString()));
+
+        System.out.println();
+    }
+
+    public static void mostrarCantidadItemsDeUnPedido(Set<Usuario> usuarios) {
+        System.out.println("=== CANTIDAD DE ÍTEMS DE UN PEDIDO ===");
+
+        usuarios.stream()
+                .flatMap(usuario -> usuario.getPedidos().stream())
+                .findFirst()
+                .ifPresent(pedido -> System.out.println(
+                        "Pedido ID " + pedido.getId()
+                                + " tiene "
+                                + pedido.calcularCantidadItems()
+                                + " ítems"
+                ));
+
+        System.out.println();
+    }
+
+    public static void mostrarProductosConStockMenorA5(Set<Producto> productos) {
+        System.out.println("=== PRODUCTOS CON STOCK MENOR A 5 ===");
+
+        productos.stream()
+                .filter(producto -> producto.getStock() < 5)
+                .forEach(producto -> System.out.println(
+                        producto.getNombre() + " - stock: " + producto.getStock()
+                ));
 
         System.out.println();
     }
