@@ -24,11 +24,9 @@ public class DataSeeder {
         productos.add(crearProducto(4L, "Jugo", 950.0, "Jugo de naranja", 15, "jugo.jpg", true));
         productos.add(crearProducto(5L, "Papas", 1200.0, "Papas fritas", 12, "papas.jpg", true));
         productos.add(crearProducto(6L, "Galletas", 900.0, "Galletitas dulces", 18, "galletas.jpg", true));
-        productos.add(crearProducto(7L, "Chocolate", 1500.0, "Chocolate en barra", 7, "chocolate.jpg", true));
-        productos.add(crearProducto(8L, "Lavandina", 1300.0, "Lavandina 1L", 9, "lavandina.jpg", true));
+        productos.add(crearProducto(7L, "Chocolate", 1500.0, "Chocolate en barra", 3, "chocolate.jpg", true));        productos.add(crearProducto(8L, "Lavandina", 1300.0, "Lavandina 1L", 9, "lavandina.jpg", true));
         productos.add(crearProducto(9L, "Detergente", 1400.0, "Detergente líquido", 11, "detergente.jpg", true));
-        productos.add(crearProducto(10L, "Esponja", 500.0, "Esponja multiuso", 25, "esponja.jpg", true));
-
+        productos.add(crearProducto(10L, "Esponja", 500.0, "Esponja multiuso", 4, "esponja.jpg", true));
         return productos;
     }
 
