@@ -1,167 +1,217 @@
 package org.example;
 
-import org.example.DTO.UsuarioDTO;
-import org.example.data.DataSeeder;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+import org.example.enums.Estado;
+import org.example.enums.FormaPago;
+import org.example.enums.Rol;
+import org.example.model.Categoria;
 import org.example.model.Pedido;
 import org.example.model.Producto;
 import org.example.model.Usuario;
 
-import java.time.LocalDateTime;
-import java.util.Set;
+import java.time.LocalDate;
 
 public class Main {
 
     public static void main(String[] args) {
-        Set<Producto> productos = DataSeeder.crearProductos();
-        Set<Usuario> usuarios = DataSeeder.crearUsuarios(productos);
-        DataSeeder.crearCategorias(productos);
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("miUnidad");
+        EntityManager em = emf.createEntityManager();
 
-        mostrarUnProducto(productos);
-        mostrarTodosLosProductos(productos);
-        mostrarPedidosDelUsuarioConMasPedidos(usuarios);
-        compararProductoNuevoConColeccion(productos);
-        mostrarUsuarioDTO(usuarios);
+        try {
+            em.getTransaction().begin();
 
-        mostrarProductosDisponibles(productos);
-        mostrarCantidadItemsDeUnPedido(usuarios);
-        mostrarProductosConStockMenorA5(productos);
-    }
+            limpiarBase(em);
 
-    public static void mostrarUnProducto(Set<Producto> productos) {
-        System.out.println("=== UN PRODUCTO ===");
+            Categoria bebidas = Categoria.builder()
+                    .nombre("Bebidas")
+                    .descripcion("Bebidas frías y calientes")
+                    .build();
 
-        for (Producto producto : productos) {
-            System.out.println(producto.toString());
-            break;
-        }
+            Categoria snacks = Categoria.builder()
+                    .nombre("Snacks")
+                    .descripcion("Papas, galletas y golosinas")
+                    .build();
 
-        System.out.println();
-    }
+            Categoria limpieza = Categoria.builder()
+                    .nombre("Limpieza")
+                    .descripcion("Productos de limpieza del hogar")
+                    .build();
 
-    public static void mostrarTodosLosProductos(Set<Producto> productos) {
-        System.out.println("=== LISTADO DE PRODUCTOS ===");
+            Producto coca = crearProducto("Coca", 1000.0, "Gaseosa cola", 10, "coca.jpg", true);
+            Producto pepsi = crearProducto("Pepsi", 1100.0, "Gaseosa cola", 8, "pepsi.jpg", true);
+            Producto agua = crearProducto("Agua", 800.0, "Agua mineral", 20, "agua.jpg", true);
+            Producto jugo = crearProducto("Jugo", 950.0, "Jugo de naranja", 15, "jugo.jpg", true);
 
-        for (Producto producto : productos) {
-            System.out.println(producto.toString());
-        }
+            Producto papas = crearProducto("Papas", 1200.0, "Papas fritas", 12, "papas.jpg", true);
+            Producto galletas = crearProducto("Galletas", 900.0, "Galletitas dulces", 18, "galletas.jpg", true);
+            Producto chocolate = crearProducto("Chocolate", 1500.0, "Chocolate en barra", 3, "chocolate.jpg", true);
 
-        System.out.println();
-    }
+            Producto lavandina = crearProducto("Lavandina", 1300.0, "Lavandina 1L", 9, "lavandina.jpg", true);
+            Producto detergente = crearProducto("Detergente", 1400.0, "Detergente líquido", 11, "detergente.jpg", true);
+            Producto esponja = crearProducto("Esponja", 500.0, "Esponja multiuso", 4, "esponja.jpg", true);
 
-    public static void mostrarPedidosDelUsuarioConMasPedidos(Set<Usuario> usuarios) {
-        System.out.println("=== PEDIDOS DEL USUARIO CON MÁS PEDIDOS ===");
+            bebidas.agregarProducto(coca);
+            bebidas.agregarProducto(pepsi);
+            bebidas.agregarProducto(agua);
+            bebidas.agregarProducto(jugo);
 
-        Usuario usuarioConMasPedidos = null;
-        int maxPedidos = -1;
+            snacks.agregarProducto(papas);
+            snacks.agregarProducto(galletas);
+            snacks.agregarProducto(chocolate);
 
-        for (Usuario usuario : usuarios) {
-            if (usuario.getPedidos().size() > maxPedidos) {
-                maxPedidos = usuario.getPedidos().size();
-                usuarioConMasPedidos = usuario;
+            limpieza.agregarProducto(lavandina);
+            limpieza.agregarProducto(detergente);
+            limpieza.agregarProducto(esponja);
+
+            em.persist(bebidas);
+            em.persist(snacks);
+            em.persist(limpieza);
+
+            Usuario usuario1 = Usuario.builder()
+                    .nombre("Juan")
+                    .apellido("Perez")
+                    .email("juan@mail.com")
+                    .celular("381111111")
+                    .contraseña("1234")
+                    .rol(Rol.USUARIO)
+                    .build();
+
+            Usuario usuario2 = Usuario.builder()
+                    .nombre("Ana")
+                    .apellido("Gomez")
+                    .email("ana@mail.com")
+                    .celular("381222222")
+                    .contraseña("5678")
+                    .rol(Rol.ADMIN)
+                    .build();
+
+            Pedido pedido1 = crearPedido(Estado.PENDIENTE, FormaPago.EFECTIVO);
+            pedido1.addDetallePedido(2, coca);
+            pedido1.addDetallePedido(1, papas);
+
+            Pedido pedido2 = crearPedido(Estado.CONFIRMADO, FormaPago.TARJETA);
+            pedido2.addDetallePedido(3, pepsi);
+            pedido2.addDetallePedido(2, galletas);
+
+            Pedido pedido3 = crearPedido(Estado.TERMINADO, FormaPago.TRANSFERENCIA);
+            pedido3.addDetallePedido(1, agua);
+            pedido3.addDetallePedido(2, detergente);
+
+            usuario1.agregarPedido(pedido1);
+            usuario1.agregarPedido(pedido2);
+            usuario2.agregarPedido(pedido3);
+
+            em.persist(usuario1);
+            em.persist(usuario2);
+
+            em.flush();
+
+            coca.setPrecio(1250.0);
+            coca.setStock(20);
+
+            papas.setPrecio(1500.0);
+            papas.setDisponible(false);
+
+            Usuario usuarioPorId = em.find(Usuario.class, usuario1.getId());
+            System.out.println("Usuario por ID: " + usuarioPorId);
+
+            Usuario usuarioPorMail = em.createQuery(
+                            "SELECT u FROM Usuario u WHERE u.email = :email",
+                            Usuario.class
+                    )
+                    .setParameter("email", "ana@mail.com")
+                    .getSingleResult();
+
+            System.out.println("Usuario por mail: " + usuarioPorMail);
+
+            limpieza.eliminarProducto(esponja);
+            em.remove(esponja);
+
+            em.flush();
+
+            Long cantidadUsuarios = em.createQuery(
+                    "SELECT COUNT(u) FROM Usuario u",
+                    Long.class
+            ).getSingleResult();
+
+            Long cantidadProductos = em.createQuery(
+                    "SELECT COUNT(p) FROM Producto p",
+                    Long.class
+            ).getSingleResult();
+
+            Long cantidadCategorias = em.createQuery(
+                    "SELECT COUNT(c) FROM Categoria c",
+                    Long.class
+            ).getSingleResult();
+
+            Long cantidadPedidos = em.createQuery(
+                    "SELECT COUNT(p) FROM Pedido p",
+                    Long.class
+            ).getSingleResult();
+
+            Long cantidadDetalles = em.createQuery(
+                    "SELECT COUNT(d) FROM DetallePedido d",
+                    Long.class
+            ).getSingleResult();
+
+            System.out.println("=== RESUMEN FINAL DE PERSISTENCIA ===");
+            System.out.println("Usuarios persistidos: " + cantidadUsuarios);
+            System.out.println("Productos persistidos: " + cantidadProductos);
+            System.out.println("Categorias persistidas: " + cantidadCategorias);
+            System.out.println("Pedidos persistidos: " + cantidadPedidos);
+            System.out.println("Detalles persistidos: " + cantidadDetalles);
+
+            em.getTransaction().commit();
+
+            System.out.println("TP JPA ejecutado correctamente.");
+
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
             }
+
+            e.printStackTrace();
+
+        } finally {
+            em.close();
+            emf.close();
         }
-
-        if (usuarioConMasPedidos != null) {
-            System.out.println("Usuario: "
-                    + usuarioConMasPedidos.getNombre()
-                    + " "
-                    + usuarioConMasPedidos.getApellido());
-
-            System.out.println("Cantidad de pedidos: " + usuarioConMasPedidos.getPedidos().size());
-
-            for (Pedido pedido : usuarioConMasPedidos.getPedidos()) {
-                System.out.println(pedido.toString());
-            }
-        }
-
-        System.out.println();
     }
 
-    public static void compararProductoNuevoConColeccion(Set<Producto> productos) {
-        System.out.println("=== COMPARACIÓN DE PRODUCTO NUEVO CON LA COLECCIÓN ===");
+    private static void limpiarBase(EntityManager em) {
+        em.createQuery("DELETE FROM DetallePedido").executeUpdate();
+        em.createQuery("DELETE FROM Pedido").executeUpdate();
+        em.createQuery("DELETE FROM Producto").executeUpdate();
+        em.createQuery("DELETE FROM Categoria").executeUpdate();
+        em.createQuery("DELETE FROM Usuario").executeUpdate();
+    }
 
-        Producto productoNuevo = Producto.builder()
-                .id(99L)
-                .eliminado(false)
-                .createdAt(LocalDateTime.now())
-                .nombre("Coca")
-                .precio(2000.0)
-                .descripcion("Producto nuevo para comparar")
-                .stock(5)
-                .imagen("coca_nueva.jpg")
-                .disponible(true)
+    private static Producto crearProducto(
+            String nombre,
+            Double precio,
+            String descripcion,
+            int stock,
+            String imagen,
+            boolean disponible
+    ) {
+        return Producto.builder()
+                .nombre(nombre)
+                .precio(precio)
+                .descripcion(descripcion)
+                .stock(stock)
+                .imagen(imagen)
+                .disponible(disponible)
                 .build();
-
-        System.out.println("Producto nuevo: " + productoNuevo);
-        System.out.println();
-
-        for (Producto producto : productos) {
-            System.out.println(
-                    "Comparando con: "
-                            + producto.getNombre()
-                            + " -> "
-                            + producto.equals(productoNuevo)
-            );
-        }
-
-        System.out.println();
     }
 
-    public static void mostrarUsuarioDTO(Set<Usuario> usuarios) {
-        System.out.println("=== USUARIO DTO SIN ROL NI CONTRASEÑA ===");
-
-        for (Usuario usuario : usuarios) {
-            UsuarioDTO usuarioDTO = new UsuarioDTO(
-                    usuario.getId(),
-                    usuario.isEliminado(),
-                    usuario.getNombre(),
-                    usuario.getApellido(),
-                    usuario.getEmail(),
-                    usuario.getCelular()
-            );
-
-            System.out.println(usuarioDTO);
-            break;
-        }
-
-        System.out.println();
-    }
-
-    public static void mostrarProductosDisponibles(Set<Producto> productos) {
-        System.out.println("=== PRODUCTOS DISPONIBLES ===");
-
-        productos.stream()
-                .filter(Producto::isDisponible)
-                .forEach(producto -> System.out.println(producto.toString()));
-
-        System.out.println();
-    }
-
-    public static void mostrarCantidadItemsDeUnPedido(Set<Usuario> usuarios) {
-        System.out.println("=== CANTIDAD DE ÍTEMS DE UN PEDIDO ===");
-
-        usuarios.stream()
-                .flatMap(usuario -> usuario.getPedidos().stream())
-                .findFirst()
-                .ifPresent(pedido -> System.out.println(
-                        "Pedido ID " + pedido.getId()
-                                + " tiene "
-                                + pedido.calcularCantidadItems()
-                                + " ítems"
-                ));
-
-        System.out.println();
-    }
-
-    public static void mostrarProductosConStockMenorA5(Set<Producto> productos) {
-        System.out.println("=== PRODUCTOS CON STOCK MENOR A 5 ===");
-
-        productos.stream()
-                .filter(producto -> producto.getStock() < 5)
-                .forEach(producto -> System.out.println(
-                        producto.getNombre() + " - stock: " + producto.getStock()
-                ));
-
-        System.out.println();
+    private static Pedido crearPedido(Estado estado, FormaPago formaPago) {
+        return Pedido.builder()
+                .fecha(LocalDate.now())
+                .estado(estado)
+                .formaPago(formaPago)
+                .total(0.0)
+                .build();
     }
 }

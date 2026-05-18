@@ -1,5 +1,9 @@
 package org.example.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,6 +19,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@Entity
+@Table(name = "productos")
 public class Producto extends Base {
 
     @EqualsAndHashCode.Include
@@ -25,6 +31,11 @@ public class Producto extends Base {
     private int stock;
     private String imagen;
     private boolean disponible;
+
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
+    @ToString.Exclude
+    private Categoria categoria;
 
     public boolean tieneStock(int cantidad) {
         return stock >= cantidad;
