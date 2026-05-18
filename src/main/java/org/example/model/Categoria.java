@@ -1,5 +1,9 @@
 package org.example.model;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -19,6 +23,8 @@ import java.util.Set;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@Entity
+@Table(name = "categorias")
 public class Categoria extends Base {
 
     @EqualsAndHashCode.Include
@@ -28,15 +34,20 @@ public class Categoria extends Base {
 
     @Builder.Default
     @ToString.Exclude
+    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL)
     private Set<Producto> productos = new HashSet<>();
 
     public void agregarProducto(Producto producto) {
         if (producto != null) {
             productos.add(producto);
+            producto.setCategoria(this);
         }
     }
 
     public void eliminarProducto(Producto producto) {
-        productos.remove(producto);
+        if (producto != null) {
+            productos.remove(producto);
+            producto.setCategoria(null);
+        }
     }
 }
