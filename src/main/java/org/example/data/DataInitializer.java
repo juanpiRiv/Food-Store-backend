@@ -1,10 +1,15 @@
 package org.example.data;
 
+import org.example.dto.categoria.CategoriaCreate;
+import org.example.dto.detallePedido.DetallePedidoCreate;
+import org.example.dto.producto.ProductoCreate;
+import org.example.dto.producto.ProductoEdit;
+import org.example.dto.usuario.UsuarioCreate;
+import org.example.dto.usuario.UsuarioDto;
 import org.example.enums.Estado;
 import org.example.enums.FormaPago;
 import org.example.enums.Rol;
 import org.example.model.Categoria;
-import org.example.model.Pedido;
 import org.example.model.Producto;
 import org.example.model.Usuario;
 import org.example.repository.CategoriaRepository;
@@ -12,15 +17,23 @@ import org.example.repository.DetallePedidoRepository;
 import org.example.repository.PedidoRepository;
 import org.example.repository.ProductoRepository;
 import org.example.repository.UsuarioRepository;
+import org.example.service.CategoriaService;
+import org.example.service.PedidoService;
+import org.example.service.ProductoService;
+import org.example.service.UsuarioService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
+
+    private final CategoriaService categoriaService;
+    private final ProductoService productoService;
+    private final UsuarioService usuarioService;
+    private final PedidoService pedidoService;
 
     private final UsuarioRepository usuarioRepository;
     private final ProductoRepository productoRepository;
@@ -29,12 +42,20 @@ public class DataInitializer implements CommandLineRunner {
     private final DetallePedidoRepository detallePedidoRepository;
 
     public DataInitializer(
+            CategoriaService categoriaService,
+            ProductoService productoService,
+            UsuarioService usuarioService,
+            PedidoService pedidoService,
             UsuarioRepository usuarioRepository,
             ProductoRepository productoRepository,
             CategoriaRepository categoriaRepository,
             PedidoRepository pedidoRepository,
             DetallePedidoRepository detallePedidoRepository
     ) {
+        this.categoriaService = categoriaService;
+        this.productoService = productoService;
+        this.usuarioService = usuarioService;
+        this.pedidoService = pedidoService;
         this.usuarioRepository = usuarioRepository;
         this.productoRepository = productoRepository;
         this.categoriaRepository = categoriaRepository;
@@ -47,107 +68,147 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) {
         limpiarBase();
 
-        Categoria bebidas = Categoria.builder()
-                .nombre("Bebidas")
-                .descripcion("Bebidas frías y calientes")
-                .build();
+        Categoria bebidas = categoriaService.crear(
+                new CategoriaCreate("Bebidas", "Bebidas frías y calientes")
+        );
 
-        Categoria snacks = Categoria.builder()
-                .nombre("Snacks")
-                .descripcion("Papas, galletas y golosinas")
-                .build();
+        Categoria snacks = categoriaService.crear(
+                new CategoriaCreate("Snacks", "Papas, galletas y golosinas")
+        );
 
-        Categoria limpieza = Categoria.builder()
-                .nombre("Limpieza")
-                .descripcion("Productos de limpieza del hogar")
-                .build();
+        Categoria limpieza = categoriaService.crear(
+                new CategoriaCreate("Limpieza", "Productos de limpieza del hogar")
+        );
 
-        Producto coca = crearProducto("Coca", 1000.0, "Gaseosa cola", 10, "coca.jpg", true);
-        Producto pepsi = crearProducto("Pepsi", 1100.0, "Gaseosa cola", 8, "pepsi.jpg", true);
-        Producto agua = crearProducto("Agua", 800.0, "Agua mineral", 20, "agua.jpg", true);
-        Producto jugo = crearProducto("Jugo", 950.0, "Jugo de naranja", 15, "jugo.jpg", true);
+        Producto coca = productoService.crear(
+                new ProductoCreate("Coca", 1000.0, "Gaseosa cola", 10, "coca.jpg", true, bebidas.getId())
+        );
 
-        Producto papas = crearProducto("Papas", 1200.0, "Papas fritas", 12, "papas.jpg", true);
-        Producto galletas = crearProducto("Galletas", 900.0, "Galletitas dulces", 18, "galletas.jpg", true);
-        Producto chocolate = crearProducto("Chocolate", 1500.0, "Chocolate en barra", 3, "chocolate.jpg", true);
+        Producto pepsi = productoService.crear(
+                new ProductoCreate("Pepsi", 1100.0, "Gaseosa cola", 8, "pepsi.jpg", true, bebidas.getId())
+        );
 
-        Producto lavandina = crearProducto("Lavandina", 1300.0, "Lavandina 1L", 9, "lavandina.jpg", true);
-        Producto detergente = crearProducto("Detergente", 1400.0, "Detergente líquido", 11, "detergente.jpg", true);
-        Producto esponja = crearProducto("Esponja", 500.0, "Esponja multiuso", 4, "esponja.jpg", true);
+        Producto agua = productoService.crear(
+                new ProductoCreate("Agua", 800.0, "Agua mineral", 20, "agua.jpg", true, bebidas.getId())
+        );
 
-        bebidas.agregarProducto(coca);
-        bebidas.agregarProducto(pepsi);
-        bebidas.agregarProducto(agua);
-        bebidas.agregarProducto(jugo);
+        Producto jugo = productoService.crear(
+                new ProductoCreate("Jugo", 950.0, "Jugo de naranja", 15, "jugo.jpg", true, bebidas.getId())
+        );
 
-        snacks.agregarProducto(papas);
-        snacks.agregarProducto(galletas);
-        snacks.agregarProducto(chocolate);
+        Producto papas = productoService.crear(
+                new ProductoCreate("Papas", 1200.0, "Papas fritas", 12, "papas.jpg", true, snacks.getId())
+        );
 
-        limpieza.agregarProducto(lavandina);
-        limpieza.agregarProducto(detergente);
-        limpieza.agregarProducto(esponja);
+        Producto galletas = productoService.crear(
+                new ProductoCreate("Galletas", 900.0, "Galletitas dulces", 18, "galletas.jpg", true, snacks.getId())
+        );
 
-        categoriaRepository.saveAll(List.of(bebidas, snacks, limpieza));
+        Producto chocolate = productoService.crear(
+                new ProductoCreate("Chocolate", 1500.0, "Chocolate en barra", 3, "chocolate.jpg", true, snacks.getId())
+        );
 
-        Usuario usuario1 = Usuario.builder()
-                .nombre("Juan")
-                .apellido("Perez")
-                .email("juan@mail.com")
-                .celular("381111111")
-                .contraseña("1234")
-                .rol(Rol.USUARIO)
-                .build();
+        Producto lavandina = productoService.crear(
+                new ProductoCreate("Lavandina", 1300.0, "Lavandina 1L", 9, "lavandina.jpg", true, limpieza.getId())
+        );
 
-        Usuario usuario2 = Usuario.builder()
-                .nombre("Ana")
-                .apellido("Gomez")
-                .email("ana@mail.com")
-                .celular("381222222")
-                .contraseña("5678")
-                .rol(Rol.ADMIN)
-                .build();
+        Producto detergente = productoService.crear(
+                new ProductoCreate("Detergente", 1400.0, "Detergente líquido", 11, "detergente.jpg", true, limpieza.getId())
+        );
 
-        Pedido pedido1 = crearPedido(Estado.PENDIENTE, FormaPago.EFECTIVO);
-        pedido1.addDetallePedido(2, coca);
-        pedido1.addDetallePedido(1, papas);
+        Producto esponja = productoService.crear(
+                new ProductoCreate("Esponja", 500.0, "Esponja multiuso", 4, "esponja.jpg", true, limpieza.getId())
+        );
 
-        Pedido pedido2 = crearPedido(Estado.CONFIRMADO, FormaPago.TARJETA);
-        pedido2.addDetallePedido(3, pepsi);
-        pedido2.addDetallePedido(2, galletas);
+        Usuario usuario1 = usuarioService.crear(
+                new UsuarioCreate(
+                        "Juan",
+                        "Perez",
+                        "juan@mail.com",
+                        "381111111",
+                        "1234",
+                        Rol.USUARIO
+                )
+        );
 
-        Pedido pedido3 = crearPedido(Estado.TERMINADO, FormaPago.TRANSFERENCIA);
-        pedido3.addDetallePedido(1, agua);
-        pedido3.addDetallePedido(2, detergente);
+        Usuario usuario2 = usuarioService.crear(
+                new UsuarioCreate(
+                        "Ana",
+                        "Gomez",
+                        "ana@mail.com",
+                        "381222222",
+                        "5678",
+                        Rol.ADMIN
+                )
+        );
 
-        usuario1.agregarPedido(pedido1);
-        usuario1.agregarPedido(pedido2);
-        usuario2.agregarPedido(pedido3);
+        pedidoService.crear(
+                usuario1.getId(),
+                Estado.PENDIENTE,
+                FormaPago.EFECTIVO,
+                List.of(
+                        new DetallePedidoCreate(2, coca.getId()),
+                        new DetallePedidoCreate(1, papas.getId())
+                )
+        );
 
-        usuarioRepository.save(usuario1);
-        usuarioRepository.save(usuario2);
+        pedidoService.crear(
+                usuario1.getId(),
+                Estado.CONFIRMADO,
+                FormaPago.TARJETA,
+                List.of(
+                        new DetallePedidoCreate(3, pepsi.getId()),
+                        new DetallePedidoCreate(2, galletas.getId())
+                )
+        );
 
-        coca.setPrecio(1250.0);
-        coca.setStock(20);
-        productoRepository.save(coca);
+        pedidoService.crear(
+                usuario2.getId(),
+                Estado.TERMINADO,
+                FormaPago.TRANSFERENCIA,
+                List.of(
+                        new DetallePedidoCreate(1, agua.getId()),
+                        new DetallePedidoCreate(2, detergente.getId())
+                )
+        );
 
-        papas.setPrecio(1500.0);
-        papas.setDisponible(false);
-        productoRepository.save(papas);
+        productoService.editar(
+                coca.getId(),
+                new ProductoEdit(
+                        "Coca",
+                        1250.0,
+                        "Gaseosa cola",
+                        20,
+                        "coca.jpg",
+                        true,
+                        bebidas.getId()
+                )
+        );
 
-        Usuario usuarioPorId = usuarioRepository.findById(usuario1.getId()).orElseThrow();
-        System.out.println("Usuario por ID: " + usuarioPorId);
+        productoService.editar(
+                papas.getId(),
+                new ProductoEdit(
+                        "Papas",
+                        1500.0,
+                        "Papas fritas",
+                        12,
+                        "papas.jpg",
+                        false,
+                        snacks.getId()
+                )
+        );
 
-        Usuario usuarioPorMail = usuarioRepository.findByEmail("ana@mail.com").orElseThrow();
-        System.out.println("Usuario por mail: " + usuarioPorMail);
+        UsuarioDto usuarioPorId = usuarioService.buscarPorId(usuario1.getId());
+        System.out.println("Usuario por ID: " + usuarioPorId.getNombre() + " - " + usuarioPorId.getEmail());
 
-        limpieza.eliminarProducto(esponja);
-        categoriaRepository.save(limpieza);
-        productoRepository.delete(esponja);
+        UsuarioDto usuarioPorMail = usuarioService.buscarPorEmail("ana@mail.com");
+        System.out.println("Usuario por mail: " + usuarioPorMail.getNombre() + " - " + usuarioPorMail.getEmail());
+
+        productoService.eliminar(esponja.getId());
 
         imprimirResumen();
 
-        System.out.println("TP Spring Boot ejecutado correctamente.");
+        System.out.println("TP Spring Boot ejecutado correctamente usando DTOs y Services.");
     }
 
     private void limpiarBase() {
@@ -162,32 +223,6 @@ public class DataInitializer implements CommandLineRunner {
         productoRepository.flush();
         categoriaRepository.flush();
         usuarioRepository.flush();
-    }
-    private Producto crearProducto(
-            String nombre,
-            Double precio,
-            String descripcion,
-            int stock,
-            String imagen,
-            boolean disponible
-    ) {
-        return Producto.builder()
-                .nombre(nombre)
-                .precio(precio)
-                .descripcion(descripcion)
-                .stock(stock)
-                .imagen(imagen)
-                .disponible(disponible)
-                .build();
-    }
-
-    private Pedido crearPedido(Estado estado, FormaPago formaPago) {
-        return Pedido.builder()
-                .fecha(LocalDate.now())
-                .estado(estado)
-                .formaPago(formaPago)
-                .total(0.0)
-                .build();
     }
 
     private void imprimirResumen() {
