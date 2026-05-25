@@ -204,8 +204,6 @@ public class DataInitializer implements CommandLineRunner {
         UsuarioDto usuarioPorMail = usuarioService.buscarPorEmail("ana@mail.com");
         System.out.println("Usuario por mail: " + usuarioPorMail.getNombre() + " - " + usuarioPorMail.getEmail());
 
-        productoService.eliminar(esponja.getId());
-
         imprimirResumen();
 
         System.out.println("TP Spring Boot ejecutado correctamente usando DTOs y Services.");
