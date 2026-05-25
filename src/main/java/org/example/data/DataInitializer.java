@@ -151,13 +151,18 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void limpiarBase() {
-        detallePedidoRepository.deleteAll();
-        pedidoRepository.deleteAll();
-        productoRepository.deleteAll();
-        categoriaRepository.deleteAll();
-        usuarioRepository.deleteAll();
-    }
+        detallePedidoRepository.deleteAllInBatch();
+        pedidoRepository.deleteAllInBatch();
+        productoRepository.deleteAllInBatch();
+        categoriaRepository.deleteAllInBatch();
+        usuarioRepository.deleteAllInBatch();
 
+        detallePedidoRepository.flush();
+        pedidoRepository.flush();
+        productoRepository.flush();
+        categoriaRepository.flush();
+        usuarioRepository.flush();
+    }
     private Producto crearProducto(
             String nombre,
             Double precio,
