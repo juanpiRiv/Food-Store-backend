@@ -7,7 +7,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example.Main</groupId>
+    <groupId>org.example<</groupId>
     <artifactId>parcial-jpa</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>Parcial 2 JPA</name>
@@ -72,7 +72,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.0</version>
                 <configuration>
-                    <mainClass>com.tp.jpa.Main</mainClass>
+                    <mainClass>org.example.Main</mainClass>
                 </configuration>
             </plugin>
         </plugins>
