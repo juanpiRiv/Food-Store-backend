@@ -32,3 +32,13 @@ build/
 ### Mac OS ###
 .DS_Store
 data/
+.gradle/
+build/
+target/
+out/
+.idea/
+
+data/
+*.db
+*.trace.db
+*.mv.db
