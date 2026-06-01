@@ -29,6 +29,6 @@ application {
     mainClass = 'org.example.Main'
 }
 
-tasks.named('run') {
+tasks.withType(JavaExec).configureEach {
     standardInput = System.in
 }
