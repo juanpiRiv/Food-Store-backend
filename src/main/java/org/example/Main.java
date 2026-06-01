@@ -9,15 +9,33 @@ import org.example.util.JpaUtil;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class Main {
 
+    static {
+        System.setProperty("org.jboss.logging.provider", "jdk");
+
+        LogManager.getLogManager().reset();
+
+        Logger rootLogger = Logger.getLogger("");
+        rootLogger.setLevel(Level.OFF);
+
+        Logger.getLogger("org.hibernate").setLevel(Level.OFF);
+        Logger.getLogger("org.jboss").setLevel(Level.OFF);
+        Logger.getLogger("jakarta.persistence").setLevel(Level.OFF);
+    }
+
     private static final Scanner sc = new Scanner(System.in);
 
-    private static final CategoriaRepository categoriaRepository = new CategoriaRepository();
-    private static final ProductoRepository productoRepository = new ProductoRepository();
+    private static CategoriaRepository categoriaRepository;
+    private static ProductoRepository productoRepository;
 
     public static void main(String[] args) {
+        inicializarRepositorios();
+
         int opcion;
 
         try {
@@ -37,6 +55,11 @@ public class Main {
             JpaUtil.cerrar();
             sc.close();
         }
+    }
+
+    private static void inicializarRepositorios() {
+        categoriaRepository = new CategoriaRepository();
+        productoRepository = new ProductoRepository();
     }
 
     private static void mostrarMenuPrincipal() {
