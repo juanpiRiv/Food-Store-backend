@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 public class Main {
 
     static {
+        // hibernate llena la consola de logs; los apago para que la demo se vea limpia
         System.setProperty("org.jboss.logging.provider", "jdk");
 
         LogManager.getLogManager().reset();
@@ -52,6 +53,7 @@ public class Main {
                 }
             } while (opcion != 0);
         } finally {
+            // al salir libero la factory y cierro el scanner si o si
             JpaUtil.cerrar();
             sc.close();
         }
@@ -255,6 +257,7 @@ public class Main {
         double precio = leerDouble("Precio: ");
         int stock = leerEntero("Stock: ");
 
+        // no dejo entrar datos invalidos a la base: corto antes de guardar
         if (precio <= 0) {
             System.out.println("Error: el precio debe ser mayor a 0.");
             return;
@@ -290,6 +293,7 @@ public class Main {
 
         Optional<Producto> productoOpt = productoRepository.buscarPorId(id);
 
+        // me fijo que exista y que no este ya dado de baja antes de tocar nada
         if (productoOpt.isEmpty() || productoOpt.get().isEliminado()) {
             System.out.println("Error: el producto no existe o ya esta dado de baja.");
             return;
@@ -386,6 +390,7 @@ public class Main {
         }
 
         for (Producto p : productos) {
+            // si el producto no tiene categoria muestro un texto por defecto
             String nombreCategoria = p.getCategoria() != null
                     ? p.getCategoria().getNombre()
                     : "Sin categoria";

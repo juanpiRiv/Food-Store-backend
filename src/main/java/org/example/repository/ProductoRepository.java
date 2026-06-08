@@ -12,16 +12,14 @@ public class ProductoRepository extends BaseRepository<Producto> {
         super(Producto.class);
     }
 
+    // consulta propia que pedia el parcial: productos activos de una categoria
     public List<Producto> buscarPorCategoria(Long categoriaId) {
         EntityManager em = null;
 
         try {
             em = emf.createEntityManager();
 
-            /*
-             * Consulta JPQL que obtiene productos activos pertenecientes
-             * a una categoria especifica usando parametro nombrado.
-             */
+            // navego por los objetos (p.categoria.id) en vez de hacer un join a mano
             String jpql = """
                     SELECT p
                     FROM Producto p
@@ -30,6 +28,7 @@ public class ProductoRepository extends BaseRepository<Producto> {
                     """;
 
             TypedQuery<Producto> query = em.createQuery(jpql, Producto.class);
+            // paso el dato con parametro nombrado, mas seguro que concatenar a mano
             query.setParameter("categoriaId", categoriaId);
 
             return query.getResultList();

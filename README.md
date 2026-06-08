@@ -1,5 +1,6 @@
 # Parcial 2 - JPA
-
+## Link video de Youtube >
+- https://youtu.be/oNAXjP1LJrI?si=8YZKgZP1MzN1OYs4
 ## Descripción
 
 Aplicación de consola desarrollada en Java con JPA/Hibernate que permite gestionar categorías y productos de un Food Store mediante operaciones ABM completas y una consulta JPQL personalizada para filtrar productos por categoría.
