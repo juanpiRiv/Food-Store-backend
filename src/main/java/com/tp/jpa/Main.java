@@ -472,6 +472,7 @@ public class Main {
         String nuevoApellido = leerTexto("Nuevo apellido (Enter para conservar): ");
         String nuevoMail = leerTexto("Nuevo mail (Enter para conservar): ");
         String nuevoCelular = leerTexto("Nuevo celular (Enter para conservar): ");
+        String nuevaContrasena = leerTexto("Nueva contrasena (Enter para conservar): ");
 
         if (!nuevoNombre.isBlank()) usuario.setNombre(nuevoNombre);
         if (!nuevoApellido.isBlank()) usuario.setApellido(nuevoApellido);
@@ -486,6 +487,7 @@ public class Main {
         }
 
         if (!nuevoCelular.isBlank()) usuario.setCelular(nuevoCelular);
+        if (!nuevaContrasena.isBlank()) usuario.setContrasena(nuevaContrasena);
 
         usuarioRepository.guardar(usuario);
         System.out.println("Usuario modificado correctamente.");
@@ -507,7 +509,7 @@ public class Main {
         boolean eliminado = usuarioRepository.eliminarLogico(id);
 
         if (eliminado) {
-            System.out.println("Usuario dado de baja: " + opt.get().getMail());
+            System.out.println("Usuario dado de baja: " + opt.get().getNombre() + " " + opt.get().getApellido());
         } else {
             System.out.println("No se pudo dar de baja el usuario.");
         }
@@ -691,8 +693,16 @@ public class Main {
             tx.commit();
 
             System.out.println("\nPedido creado correctamente.");
-            System.out.println("ID: " + pedido.getId());
-            System.out.printf("Total: $%.2f | Forma de pago: %s%n", pedido.getTotal(), pedido.getFormaPago());
+            System.out.printf("ID: %d%n", pedido.getId());
+            System.out.printf("Usuario: %s %s%n", usuario.getNombre(), usuario.getApellido());
+            System.out.printf("Fecha: %s%n", pedido.getFecha().toLocalDate());
+            System.out.printf("Forma de pago: %s%n", pedido.getFormaPago());
+            System.out.println("Productos:");
+            for (var d : pedido.getDetalles()) {
+                System.out.printf("  - %s x%d = $%.2f%n",
+                        d.getProducto().getNombre(), d.getCantidad(), d.getSubtotal());
+            }
+            System.out.printf(java.util.Locale.US, "Total: $%.2f%n", pedido.getTotal());
             System.out.println("Estado: " + pedido.getEstado());
 
         } catch (Exception e) {
@@ -755,7 +765,8 @@ public class Main {
         boolean eliminado = pedidoRepository.eliminarLogico(id);
 
         if (eliminado) {
-            System.out.println("Pedido dado de baja. ID: " + id);
+            System.out.printf(java.util.Locale.US, "Pedido dado de baja. ID: %d | Total: $%.2f%n",
+                    id, opt.get().getTotal());
         } else {
             System.out.println("No se pudo dar de baja el pedido.");
         }
@@ -994,7 +1005,7 @@ public class Main {
                 .sum();
 
         System.out.printf("Cantidad de pedidos terminados: %d%n", terminados.size());
-        System.out.printf("Total facturado: $%.2f%n", totalFacturado);
+        System.out.printf(java.util.Locale.US, "Total facturado: $%.2f%n", totalFacturado);
     }
 
     // ===== UTILIDADES DE INPUT =====
