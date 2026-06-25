@@ -1,143 +1,93 @@
-# Food Store — TPI Programación III
+# Food Store — Backend JPA / Consola
 
-**Trabajo Práctico Integrador — UTN**
-**Alumno**: Juan Pablo Rivero
+**Trabajo Final Integrador — Programación III — UTN TUPaD**
+**Alumno:** Juan Pablo Rivero
 
 ---
 
 ## Descripción
 
-Food Store es un sistema de ecommerce de comida compuesto por:
-- **Backend de consola** (Java + Gradle + JPA/Hibernate + H2)
-- **Frontend web** (TypeScript + Vite + localStorage)
+Aplicación de consola para el sistema de gestión de pedidos de comida **Food Store**. Gestiona categorías, productos, usuarios y pedidos con persistencia real en base de datos H2 mediante JPA/Hibernate.
 
-Los dos componentes son independientes: el backend persiste datos en una base H2, el frontend usa localStorage para la demo académica.
+Sin Spring Boot. Sin API REST. Interacción exclusivamente por consola, con menús navegables.
 
 ---
 
 ## Tecnologías
 
-### Backend
-| Tecnología | Versión |
-|---|---|
-| Java | 21 |
-| Gradle | 9.5.1 |
-| Hibernate ORM | 6.6.4 |
-| H2 Database | 2.3.232 |
-| Lombok | 1.18.44 |
-
-### Frontend
-| Tecnología | Versión |
-|---|---|
-| TypeScript | 5.7 |
-| Vite | 6.x |
-| HTML/CSS Puro | — |
+| Tecnología       | Versión   |
+|------------------|-----------|
+| Java             | 21        |
+| Gradle           | 8.x       |
+| Hibernate ORM    | 6.6.4     |
+| Jakarta JPA      | 3.x       |
+| H2 Database      | 2.3.232   |
+| Lombok           | 1.18.44   |
 
 ---
 
-## Estructura
-
-```
-Food-Store-backend/
-├── build.gradle
-├── settings.gradle
-├── src/main/java/com/tp/jpa/
-│   ├── Main.java
-│   ├── model/
-│   │   ├── Base.java
-│   │   ├── Calculable.java
-│   │   ├── Categoria.java, Producto.java
-│   │   ├── Usuario.java, Pedido.java, DetallePedido.java
-│   │   └── enums/ (Rol, Estado, FormaPago)
-│   ├── repository/
-│   └── util/JpaUtil.java
-├── src/main/resources/META-INF/persistence.xml
-├── specs/
-└── docs/
-```
-
----
-
-## Cómo correr el Backend
+## Instalación y ejecución
 
 ```bash
-# macOS/Linux
+# macOS / Linux
 ./gradlew run
 
 # Windows
 gradlew.bat run
 ```
 
-La base de datos H2 se crea automáticamente en `./data/jpa_db`.
+La base de datos H2 se crea automáticamente en `./data/jpa_db` al ejecutar por primera vez. No requiere instalación de base de datos externa.
 
 ---
 
-## Cómo correr el Frontend
+## Estructura de paquetes
 
-```bash
-cd Food-Store-Prog-III-JuanPabloRivero-UTN
-npm install
-npm run dev
-# Abrir http://localhost:5173
+```
+src/main/java/com/tp/jpa/
+├── Main.java                   ← menú principal de consola
+├── model/
+│   ├── Base.java               ← @MappedSuperclass con id, eliminado, createdAt
+│   ├── Calculable.java         ← interfaz con calcularTotal()
+│   ├── Categoria.java
+│   ├── Producto.java
+│   ├── Usuario.java
+│   ├── Pedido.java             ← implementa Calculable
+│   ├── DetallePedido.java
+│   └── enums/
+│       ├── Estado.java         ← PENDIENTE, CONFIRMADO, TERMINADO, CANCELADO
+│       ├── FormaPago.java      ← TARJETA, TRANSFERENCIA, EFECTIVO
+│       └── Rol.java            ← ADMIN, USUARIO
+├── repository/
+│   ├── BaseRepository.java     ← CRUD genérico para todas las entidades
+│   ├── CategoriaRepository.java
+│   ├── ProductoRepository.java ← buscarPorCategoria() con JPQL
+│   ├── UsuarioRepository.java  ← buscarPorMail() con JPQL
+│   └── PedidoRepository.java   ← buscarPorUsuario(), buscarPorEstado() con JPQL
+└── util/
+    └── JpaUtil.java            ← Singleton del EntityManagerFactory
+
+src/main/resources/META-INF/persistence.xml
 ```
 
 ---
 
-## Usuarios de Prueba (Frontend)
+## Menú principal
 
-| Email | Contraseña | Rol |
-|---|---|---|
-| admin@foodstore.local | admin123 | ADMIN |
-| (registrarse) | mínimo 8 caracteres | USUARIO |
-
----
-
-## Funcionalidades
-
-### Backend (Consola)
-- ABM Categorías, Productos, Usuarios, Pedidos
-- Alta de pedido atómica (una transacción, descuenta stock)
-- Cambiar estado de pedido
-- Baja lógica en todas las entidades
-- 4 tipos de reportes (incluyendo total facturado solo TERMINADO)
-
-### Frontend (Web)
-- Login con roles (ADMIN / USUARIO)
-- Catálogo con búsqueda, filtro por categoría y ordenamiento
-- Detalle de producto con selector de cantidad y validación de stock
-- Carrito con forma de pago y revalidación de stock al confirmar
-- Mis pedidos con estado visible
-- Panel Admin: Dashboard, Categorías, Productos, Pedidos
-
----
-
-## Seguridad (Aclaración Académica)
-
-La autenticación del frontend es **solo educativa**:
-- No usa JWT ni sesiones del lado servidor.
-- Los datos se guardan en localStorage del navegador.
-- **No apto para producción real.**
-
----
-
-## Build
-
-```bash
-# Backend
-./gradlew clean build   # → BUILD SUCCESSFUL
-
-# Frontend
-npm run build           # → sin errores TypeScript
+```
+1. Gestionar Categorías   → ABM completo con baja lógica
+2. Gestionar Productos    → ABM con validación de precio/stock y categoría
+3. Gestionar Usuarios     → ABM con unicidad de mail y búsqueda por mail
+4. Gestionar Pedidos      → Alta atómica, cambio de estado, baja lógica
+5. Reportes               → Productos por categoría, pedidos por usuario/estado, total facturado
+0. Salir                  → cierra EntityManagerFactory correctamente
 ```
 
 ---
 
-## Video Demo
+## Decisiones técnicas clave
 
-[Link al video — pendiente de grabación]
-
----
-
-## Branch
-
-`tpi-final-foodstore` (no se modificó master directamente)
+- **Transacción atómica en Alta de Pedido:** todo el alta (validación de stock, descuento de inventario, persistencia del pedido y sus detalles) ocurre en una única transacción. Cualquier falla hace rollback completo.
+- **Baja lógica:** ningún registro se borra físicamente. El campo `eliminado = true` lo excluye de todos los listados activos.
+- **BaseRepository genérico:** una sola clase abstracta implementa `guardar()`, `buscarPorId()`, `listarActivos()` y `eliminarLogico()` para todas las entidades.
+- **JPQL dinámico:** la consulta de `listarActivos()` usa `entityClass.getSimpleName()` para funcionar con cualquier entidad sin duplicar código.
+- **Singleton JpaUtil:** el `EntityManagerFactory` se crea una sola vez y se cierra al salir de la aplicación.
