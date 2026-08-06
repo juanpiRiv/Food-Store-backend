@@ -1,4 +1,4 @@
-# Food Store — Backend JPA / Consola
+# Food Store — Backend Spring Boot
 
 **Trabajo Final Integrador — Programación III — UTN TUPaD**
 **Alumno:** Juan Pablo Rivero
@@ -7,9 +7,7 @@
 
 ## Descripción
 
-Aplicación de consola para el sistema de gestión de pedidos de comida **Food Store**. Gestiona categorías, productos, usuarios y pedidos con persistencia real en base de datos H2 mediante JPA/Hibernate.
-
-Sin Spring Boot. Sin API REST. Interacción exclusivamente por consola, con menús navegables.
+Sistema de gestión de pedidos de comida **Food Store** en Spring Boot. La API REST se desarrollará en próximas etapas sobre una arquitectura en capas (controladores, servicios, repositorios). Continúa la práctica JPA anterior: el dominio (categorías, productos, usuarios, pedidos) se reutilizará.
 
 ---
 
@@ -18,11 +16,13 @@ Sin Spring Boot. Sin API REST. Interacción exclusivamente por consola, con men�
 | Tecnología       | Versión   |
 |------------------|-----------|
 | Java             | 21        |
-| Gradle           | 8.x       |
-| Hibernate ORM    | 6.6.4     |
-| Jakarta JPA      | 3.x       |
-| H2 Database      | 2.3.232   |
-| Lombok           | 1.18.44   |
+| Maven            | 3.9       |
+| Spring Boot      | 3.5.9     |
+| Spring Web       | -         |
+| Spring Data JPA  | -         |
+| Lombok           | -         |
+| H2 Database      | -         |
+| Spring Boot DevTools | -    |
 
 ---
 
@@ -30,64 +30,55 @@ Sin Spring Boot. Sin API REST. Interacción exclusivamente por consola, con men�
 
 ```bash
 # macOS / Linux
-./gradlew run
+./mvnw spring-boot:run
 
-# Windows
-gradlew.bat run
+# alternativa (si Maven está instalado globalmente)
+mvn spring-boot:run
 ```
 
-La base de datos H2 se crea automáticamente en `./data/jpa_db` al ejecutar por primera vez. No requiere instalación de base de datos externa.
+La consola de H2 queda disponible en [http://localhost:8080/h2-console](http://localhost:8080/h2-console) con:
+
+- **JDBC URL:** `jdbc:h2:mem:foodstore`
+- **Usuario:** `sa`
+- **Contraseña:** (vacía)
 
 ---
 
 ## Estructura de paquetes
 
 ```
-src/main/java/com/tp/jpa/
-├── Main.java                   ← menú principal de consola
-├── model/
-│   ├── Base.java               ← @MappedSuperclass con id, eliminado, createdAt
-│   ├── Calculable.java         ← interfaz con calcularTotal()
-│   ├── Categoria.java
-│   ├── Producto.java
-│   ├── Usuario.java
-│   ├── Pedido.java             ← implementa Calculable
-│   ├── DetallePedido.java
-│   └── enums/
-│       ├── Estado.java         ← PENDIENTE, CONFIRMADO, TERMINADO, CANCELADO
-│       ├── FormaPago.java      ← TARJETA, TRANSFERENCIA, EFECTIVO
-│       └── Rol.java            ← ADMIN, USUARIO
-├── repository/
-│   ├── BaseRepository.java     ← CRUD genérico para todas las entidades
-│   ├── CategoriaRepository.java
-│   ├── ProductoRepository.java ← buscarPorCategoria() con JPQL
-│   ├── UsuarioRepository.java  ← buscarPorMail() con JPQL
-│   └── PedidoRepository.java   ← buscarPorUsuario(), buscarPorEstado() con JPQL
-└── util/
-    └── JpaUtil.java            ← Singleton del EntityManagerFactory
-
-src/main/resources/META-INF/persistence.xml
+src/main/java/com/tp/foodstore/
+├── FoodStoreApplication.java     ← clase principal
+├── config/                       ← configuración de la aplicación
+├── controller/                   ← controladores REST
+├── service/
+│   ├── interfaces/               ← contratos de servicios
+│   └── impl/                     ← implementaciones de servicios
+├── repository/                   ← repositorios Spring Data JPA
+├── entity/                       ← entidades JPA del dominio
+├── dto/
+│   ├── categoria/                ← DTOs de categorías
+│   ├── detallePedido/            ← DTOs de detalle de pedidos
+│   ├── pedido/                   ← DTOs de pedidos
+│   ├── producto/                 ← DTOs de productos
+│   └── usuario/                  ← DTOs de usuarios
+├── mapper/                       ← conversión entre entidades y DTOs
+├── exception/                    ← excepciones y manejo global de errores
+└── util/                         ← clases de utilidad
 ```
 
 ---
 
-## Menú principal
+## Responsabilidad de cada paquete
 
-```
-1. Gestionar Categorías   → ABM completo con baja lógica
-2. Gestionar Productos    → ABM con validación de precio/stock y categoría
-3. Gestionar Usuarios     → ABM con unicidad de mail y búsqueda por mail
-4. Gestionar Pedidos      → Alta atómica, cambio de estado, baja lógica
-5. Reportes               → Productos por categoría, pedidos por usuario/estado, total facturado
-0. Salir                  → cierra EntityManagerFactory correctamente
-```
-
----
-
-## Decisiones técnicas clave
-
-- **Transacción atómica en Alta de Pedido:** todo el alta (validación de stock, descuento de inventario, persistencia del pedido y sus detalles) ocurre en una única transacción. Cualquier falla hace rollback completo.
-- **Baja lógica:** ningún registro se borra físicamente. El campo `eliminado = true` lo excluye de todos los listados activos.
-- **BaseRepository genérico:** una sola clase abstracta implementa `guardar()`, `buscarPorId()`, `listarActivos()` y `eliminarLogico()` para todas las entidades.
-- **JPQL dinámico:** la consulta de `listarActivos()` usa `entityClass.getSimpleName()` para funcionar con cualquier entidad sin duplicar código.
-- **Singleton JpaUtil:** el `EntityManagerFactory` se crea una sola vez y se cierra al salir de la aplicación.
+| Paquete      | Responsabilidad |
+|--------------|-----------------|
+| config       | Beans y configuración general de la aplicación |
+| controller   | Expone los endpoints de la API REST |
+| service      | Contratos e implementaciones de la lógica de negocio |
+| repository   | Acceso a datos con Spring Data JPA |
+| entity       | Entidades JPA del dominio reutilizadas de la práctica anterior |
+| dto          | Objetos de transferencia de datos agrupados por módulo |
+| mapper       | Conversión entre entidades y DTOs |
+| exception    | Excepciones de negocio y manejo global de errores |
+| util         | Utilidades de propósito general |
