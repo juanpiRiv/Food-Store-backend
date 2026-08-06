@@ -42,6 +42,8 @@ La consola de H2 queda disponible en [http://localhost:8080/h2-console](http://l
 - **Usuario:** `sa`
 - **Contraseña:** (vacía)
 
+Al iniciar la aplicación se imprime en consola un resumen de los datos de ejemplo instanciados en memoria a partir de los DTOs (usuarios, categorías, productos y pedidos con sus totales).
+
 ---
 
 ## Estructura de paquetes
@@ -49,13 +51,14 @@ La consola de H2 queda disponible en [http://localhost:8080/h2-console](http://l
 ```
 src/main/java/com/tp/foodstore/
 ├── FoodStoreApplication.java     ← clase principal
-├── config/                       ← configuración de la aplicación
+├── config/                       ← configuración de la aplicación (incluye DataInitializer)
 ├── controller/                   ← controladores REST
 ├── service/
 │   ├── interfaces/               ← contratos de servicios
 │   └── impl/                     ← implementaciones de servicios
 ├── repository/                   ← repositorios Spring Data JPA
-├── entity/                       ← entidades JPA del dominio
+├── entity/                       ← entidades JPA reutilizadas de la práctica JPA anterior
+│   └── enums/                    ← enums del dominio (Estado, FormaPago, Rol)
 ├── dto/
 │   ├── categoria/                ← DTOs de categorías
 │   ├── detallePedido/            ← DTOs de detalle de pedidos
@@ -73,11 +76,11 @@ src/main/java/com/tp/foodstore/
 
 | Paquete      | Responsabilidad |
 |--------------|-----------------|
-| config       | Beans y configuración general de la aplicación |
+| config       | Beans y configuración general de la aplicación; `DataInitializer` instancia datos de ejemplo a partir de DTOs al iniciar |
 | controller   | Expone los endpoints de la API REST |
 | service      | Contratos e implementaciones de la lógica de negocio |
 | repository   | Acceso a datos con Spring Data JPA |
-| entity       | Entidades JPA del dominio reutilizadas de la práctica anterior |
+| entity       | Entidades JPA del dominio reutilizadas de la práctica anterior, junto con sus enums en `entity/enums/` |
 | dto          | Objetos de transferencia de datos agrupados por módulo |
 | mapper       | Conversión entre entidades y DTOs |
 | exception    | Excepciones de negocio y manejo global de errores |
