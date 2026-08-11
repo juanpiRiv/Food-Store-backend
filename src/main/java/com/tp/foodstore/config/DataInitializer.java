@@ -16,6 +16,10 @@ import com.tp.foodstore.mapper.CategoriaMapper;
 import com.tp.foodstore.mapper.PedidoMapper;
 import com.tp.foodstore.mapper.ProductoMapper;
 import com.tp.foodstore.mapper.UsuarioMapper;
+import com.tp.foodstore.repository.CategoriaRepository;
+import com.tp.foodstore.repository.PedidoRepository;
+import com.tp.foodstore.repository.ProductoRepository;
+import com.tp.foodstore.repository.UsuarioRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -24,8 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Instancia en memoria datos de ejemplo a partir de los DTOs de creación,
- * para mostrar el flujo DTO -> entidad al iniciar la aplicación.
+ * Persiste datos de ejemplo en la base H2 a partir de los DTOs de creación,
+ * para mostrar el flujo DTO -> entidad -> base al iniciar la aplicación.
  */
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -34,23 +38,35 @@ public class DataInitializer implements CommandLineRunner {
     private final ProductoMapper productoMapper;
     private final UsuarioMapper usuarioMapper;
     private final PedidoMapper pedidoMapper;
+    private final CategoriaRepository categoriaRepository;
+    private final ProductoRepository productoRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final PedidoRepository pedidoRepository;
 
     public DataInitializer(CategoriaMapper categoriaMapper,
                            ProductoMapper productoMapper,
                            UsuarioMapper usuarioMapper,
-                           PedidoMapper pedidoMapper) {
+                           PedidoMapper pedidoMapper,
+                           CategoriaRepository categoriaRepository,
+                           ProductoRepository productoRepository,
+                           UsuarioRepository usuarioRepository,
+                           PedidoRepository pedidoRepository) {
         this.categoriaMapper = categoriaMapper;
         this.productoMapper = productoMapper;
         this.usuarioMapper = usuarioMapper;
         this.pedidoMapper = pedidoMapper;
+        this.categoriaRepository = categoriaRepository;
+        this.productoRepository = productoRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.pedidoRepository = pedidoRepository;
     }
 
     @Override
     public void run(String... args) {
-        List<Usuario> usuarios = crearUsuarios();
-        List<Categoria> categorias = crearCategorias();
-        List<Producto> productos = crearProductos(categorias);
-        List<Pedido> pedidos = crearPedidos(usuarios, productos);
+        List<Usuario> usuarios = usuarioRepository.saveAll(crearUsuarios());
+        List<Categoria> categorias = categoriaRepository.saveAll(crearCategorias());
+        List<Producto> productos = productoRepository.saveAll(crearProductos(categorias));
+        List<Pedido> pedidos = pedidoRepository.saveAll(crearPedidos(usuarios, productos));
         imprimirResumen(usuarios, categorias, productos, pedidos);
     }
 
@@ -269,18 +285,18 @@ public class DataInitializer implements CommandLineRunner {
 
         System.out.println("\nUsuarios (" + usuarios.size() + "):");
         for (Usuario u : usuarios) {
-            System.out.println("  - " + u.getNombre() + " " + u.getApellido()
+            System.out.println("  - id " + u.getId() + ": " + u.getNombre() + " " + u.getApellido()
                     + " (" + u.getMail() + ") - rol " + u.getRol());
         }
 
         System.out.println("\nCategorías (" + categorias.size() + "):");
         for (Categoria c : categorias) {
-            System.out.println("  - " + c.getNombre());
+            System.out.println("  - id " + c.getId() + ": " + c.getNombre());
         }
 
         System.out.println("\nProductos (" + productos.size() + "):");
         for (Producto p : productos) {
-            System.out.println("  - " + p.getNombre()
+            System.out.println("  - id " + p.getId() + ": " + p.getNombre()
                     + " ($" + p.getPrecio() + ") - stock " + p.getStock()
                     + " - categoría " + p.getCategoria().getNombre());
         }
@@ -288,12 +304,21 @@ public class DataInitializer implements CommandLineRunner {
         System.out.println("\nPedidos (" + pedidos.size() + "):");
         for (int i = 0; i < pedidos.size(); i++) {
             Pedido p = pedidos.get(i);
-            System.out.println("  - Pedido " + (i + 1)
-                    + ": estado " + p.getEstado()
+            System.out.println("  - Pedido " + (i + 1) + " (id " + p.getId()
+                    + "): estado " + p.getEstado()
                     + ", forma de pago " + p.getFormaPago()
                     + ", total $" + p.getTotal()
                     + " (" + p.getDetalles().size() + " detalles)");
         }
+
+        int totalDetalles = pedidos.stream()
+                .mapToInt(p -> p.getDetalles().size())
+                .sum();
+        System.out.println("\nGuardados en la base: " + usuarioRepository.count() + " usuarios, "
+                + categoriaRepository.count() + " categorias, "
+                + productoRepository.count() + " productos, "
+                + pedidoRepository.count() + " pedidos ("
+                + totalDetalles + " detalles en total)");
         System.out.println("\n===== FIN DEL RESUMEN =====");
     }
 }

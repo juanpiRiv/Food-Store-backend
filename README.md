@@ -42,7 +42,7 @@ La consola de H2 queda disponible en [http://localhost:8080/h2-console](http://l
 - **Usuario:** `sa`
 - **Contraseña:** (vacía)
 
-Al iniciar la aplicación se imprime en consola un resumen de los datos de ejemplo instanciados en memoria a partir de los DTOs (usuarios, categorías, productos y pedidos con sus totales).
+Al iniciar la aplicación, `DataInitializer` persiste en la base H2 los datos de ejemplo instanciados a partir de los DTOs (usuarios, categorías, productos y pedidos con sus totales) a través de los repositorios, e imprime un resumen con los IDs asignados y los conteos guardados.
 
 ---
 
@@ -76,7 +76,7 @@ src/main/java/com/tp/foodstore/
 
 | Paquete      | Responsabilidad |
 |--------------|-----------------|
-| config       | Beans y configuración general de la aplicación; `DataInitializer` instancia datos de ejemplo a partir de DTOs al iniciar |
+| config       | Beans y configuración general de la aplicación; `DataInitializer` persiste los datos de ejemplo a partir de DTOs en H2 al iniciar |
 | controller   | Expone los endpoints de la API REST |
 | service      | Contratos e implementaciones de la lógica de negocio |
 | repository   | Acceso a datos con Spring Data JPA |
