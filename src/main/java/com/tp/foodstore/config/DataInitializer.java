@@ -63,10 +63,26 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        List<Usuario> usuarios = usuarioRepository.saveAll(crearUsuarios());
-        List<Categoria> categorias = categoriaRepository.saveAll(crearCategorias());
-        List<Producto> productos = productoRepository.saveAll(crearProductos(categorias));
-        List<Pedido> pedidos = pedidoRepository.saveAll(crearPedidos(usuarios, productos));
+        List<Usuario> usuarios = new ArrayList<>();
+        for (Usuario usuario : crearUsuarios()) {
+            usuarios.add(usuarioRepository.save(usuario));
+        }
+
+        List<Categoria> categorias = new ArrayList<>();
+        for (Categoria categoria : crearCategorias()) {
+            categorias.add(categoriaRepository.save(categoria));
+        }
+
+        List<Producto> productos = new ArrayList<>();
+        for (Producto producto : crearProductos(categorias)) {
+            productos.add(productoRepository.save(producto));
+        }
+
+        List<Pedido> pedidos = new ArrayList<>();
+        for (Pedido pedido : crearPedidos(usuarios, productos)) {
+            pedidos.add(pedidoRepository.save(pedido));
+        }
+
         imprimirResumen(usuarios, categorias, productos, pedidos);
     }
 
