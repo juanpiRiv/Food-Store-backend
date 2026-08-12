@@ -1,6 +1,6 @@
 package com.tp.foodstore.dto.pedido;
 
-import com.tp.foodstore.dto.detallePedido.DetallePedidoCreate;
+import com.tp.foodstore.dto.detallePedido.DetallePedidoDto;
 import com.tp.foodstore.entity.enums.Estado;
 import com.tp.foodstore.entity.enums.FormaPago;
 import lombok.Data;
@@ -20,5 +20,5 @@ public class PedidoDto {
     private Double total;
     private FormaPago formaPago;
     private Long usuarioId;
-    private List<DetallePedidoCreate> detalles;
+    private List<DetallePedidoDto> detalles;
 }

@@ -1,6 +1,7 @@
 package com.tp.foodstore.mapper;
 
 import com.tp.foodstore.dto.detallePedido.DetallePedidoCreate;
+import com.tp.foodstore.dto.detallePedido.DetallePedidoDto;
 import com.tp.foodstore.dto.pedido.PedidoDto;
 import com.tp.foodstore.dto.pedido.PedidoEdit;
 import com.tp.foodstore.entity.DetallePedido;
@@ -42,13 +43,27 @@ public class PedidoMapper {
         return pedido;
     }
 
-    public PedidoDto toDto(Pedido pedido) {
+    public PedidoDto toDto(Pedido pedido, Long usuarioId) {
         PedidoDto dto = new PedidoDto();
         dto.setId(pedido.getId());
         dto.setFecha(pedido.getFecha());
         dto.setEstado(pedido.getEstado());
         dto.setFormaPago(pedido.getFormaPago());
         dto.setTotal(pedido.getTotal());
+        dto.setUsuarioId(usuarioId);
+        dto.setDetalles(pedido.getDetalles().stream()
+                .map(this::toDetalleDto)
+                .toList());
+        return dto;
+    }
+
+    private DetallePedidoDto toDetalleDto(DetallePedido detalle) {
+        DetallePedidoDto dto = new DetallePedidoDto();
+        dto.setId(detalle.getId());
+        dto.setCantidad(detalle.getCantidad());
+        dto.setSubtotal(detalle.getSubtotal());
+        dto.setProductoId(detalle.getProducto().getId());
+        dto.setNombreProducto(detalle.getProducto().getNombre());
         return dto;
     }
 }

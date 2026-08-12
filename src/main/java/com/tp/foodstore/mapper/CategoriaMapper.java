@@ -2,6 +2,7 @@ package com.tp.foodstore.mapper;
 
 import com.tp.foodstore.dto.categoria.CategoriaCreate;
 import com.tp.foodstore.dto.categoria.CategoriaDto;
+import com.tp.foodstore.dto.categoria.CategoriaEdit;
 import com.tp.foodstore.entity.Categoria;
 import org.springframework.stereotype.Component;
 
@@ -24,5 +25,13 @@ public class CategoriaMapper {
         dto.setNombre(categoria.getNombre());
         dto.setDescripcion(categoria.getDescripcion());
         return dto;
+    }
+
+    /**
+     * Aplica los datos editables del DTO sobre una categoría existente.
+     */
+    public void actualizar(Categoria categoria, CategoriaEdit dto) {
+        categoria.setNombre(dto.getNombre());
+        categoria.setDescripcion(dto.getDescripcion());
     }
 }

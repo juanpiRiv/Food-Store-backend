@@ -11,4 +11,6 @@ public class DetallePedidoDto {
     private Long id;
     private int cantidad;
     private Double subtotal;
+    private Long productoId;
+    private String nombreProducto;
 }
