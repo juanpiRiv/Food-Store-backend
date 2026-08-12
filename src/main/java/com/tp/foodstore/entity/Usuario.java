@@ -1,7 +1,6 @@
 package com.tp.foodstore.entity;
 
 import com.tp.foodstore.entity.enums.Rol;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -49,6 +48,6 @@ public class Usuario extends Base {
 
     @Builder.Default
     @ToString.Exclude
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "usuario")
     private Set<Pedido> pedidos = new HashSet<>();
 }

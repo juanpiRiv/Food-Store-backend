@@ -1,11 +1,14 @@
 package com.tp.foodstore.repository;
 
 import com.tp.foodstore.entity.Usuario;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
 
 /**
- * Repositorio de la entidad Usuario.
+ * Repositorio de Usuario, con consultas derivadas por mail.
  */
-@Repository
-public interface UsuarioRepository extends BaseRepository<Usuario, Long> {
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+
+    Optional<Usuario> findByMail(String mail);
 }

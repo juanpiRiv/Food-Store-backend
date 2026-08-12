@@ -1,11 +1,10 @@
 package com.tp.foodstore.repository;
 
 import com.tp.foodstore.entity.Pedido;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * Repositorio de la entidad Pedido.
+ * Acceso a datos de la entidad Pedido.
  */
-@Repository
-public interface PedidoRepository extends BaseRepository<Pedido, Long> {
+public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 }

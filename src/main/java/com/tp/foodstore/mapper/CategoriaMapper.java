@@ -27,9 +27,6 @@ public class CategoriaMapper {
         return dto;
     }
 
-    /**
-     * Aplica los datos editables del DTO sobre una categoría existente.
-     */
     public void actualizar(Categoria categoria, CategoriaEdit dto) {
         categoria.setNombre(dto.getNombre());
         categoria.setDescripcion(dto.getDescripcion());

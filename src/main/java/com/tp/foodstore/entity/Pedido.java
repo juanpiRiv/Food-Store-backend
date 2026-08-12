@@ -6,6 +6,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -41,6 +43,11 @@ public class Pedido extends Base implements Calculable {
 
     @Enumerated(EnumType.STRING)
     private FormaPago formaPago;
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    @ToString.Exclude
+    private Usuario usuario;
 
     @Builder.Default
     @ToString.Exclude

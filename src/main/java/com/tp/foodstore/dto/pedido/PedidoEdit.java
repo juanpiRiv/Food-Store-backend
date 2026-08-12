@@ -6,7 +6,6 @@ import com.tp.foodstore.entity.enums.FormaPago;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -16,7 +15,6 @@ import java.util.List;
  * DTO para crear un pedido.
  */
 @Data
-@Builder
 public class PedidoEdit {
 
     private LocalDateTime fecha;

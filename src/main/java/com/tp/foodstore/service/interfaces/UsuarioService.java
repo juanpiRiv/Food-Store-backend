@@ -2,6 +2,7 @@ package com.tp.foodstore.service.interfaces;
 
 import com.tp.foodstore.dto.usuario.UsuarioCreate;
 import com.tp.foodstore.dto.usuario.UsuarioDto;
+import com.tp.foodstore.dto.usuario.UsuarioEdit;
 
 import java.util.List;
 
@@ -15,6 +16,8 @@ public interface UsuarioService {
     UsuarioDto obtenerPorId(Long id);
 
     UsuarioDto buscarPorMail(String mail);
+
+    UsuarioDto actualizar(Long id, UsuarioEdit dto);
 
     List<UsuarioDto> listar();
 }

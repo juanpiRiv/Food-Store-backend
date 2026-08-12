@@ -1,11 +1,10 @@
 package com.tp.foodstore.repository;
 
 import com.tp.foodstore.entity.Categoria;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * Repositorio de la entidad Categoria.
+ * Acceso a datos de la entidad Categoria.
  */
-@Repository
-public interface CategoriaRepository extends BaseRepository<Categoria, Long> {
+public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
 }

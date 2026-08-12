@@ -1,11 +1,10 @@
 package com.tp.foodstore.repository;
 
 import com.tp.foodstore.entity.Producto;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * Repositorio de la entidad Producto.
+ * Repositorio de Producto.
  */
-@Repository
-public interface ProductoRepository extends BaseRepository<Producto, Long> {
+public interface ProductoRepository extends JpaRepository<Producto, Long> {
 }

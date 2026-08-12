@@ -2,6 +2,7 @@ package com.tp.foodstore.service.impl;
 
 import com.tp.foodstore.dto.usuario.UsuarioCreate;
 import com.tp.foodstore.dto.usuario.UsuarioDto;
+import com.tp.foodstore.dto.usuario.UsuarioEdit;
 import com.tp.foodstore.entity.Usuario;
 import com.tp.foodstore.exception.NegocioException;
 import com.tp.foodstore.mapper.UsuarioMapper;
@@ -38,12 +39,15 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioDto buscarPorMail(String mail) {
-        return usuarioRepository.findAll().stream()
-                .filter(usuario -> !usuario.isEliminado())
-                .filter(usuario -> usuario.getMail().equalsIgnoreCase(mail))
-                .map(usuarioMapper::toDto)
-                .findFirst()
-                .orElseThrow(() -> new NegocioException("Usuario no encontrado con mail " + mail));
+        return usuarioMapper.toDto(usuarioRepository.findByMail(mail)
+                .orElseThrow(() -> new NegocioException("Usuario no encontrado con mail " + mail)));
+    }
+
+    @Override
+    public UsuarioDto actualizar(Long id, UsuarioEdit dto) {
+        Usuario usuario = buscar(id);
+        usuarioMapper.actualizar(usuario, dto);
+        return usuarioMapper.toDto(usuarioRepository.save(usuario));
     }
 
     @Override

@@ -37,9 +37,6 @@ public class ProductoMapper {
         return dto;
     }
 
-    /**
-     * Aplica los datos editables del DTO sobre un producto existente.
-     */
     public void actualizar(Producto producto, ProductoEdit dto, Categoria categoria) {
         producto.setNombre(dto.getNombre());
         producto.setPrecio(dto.getPrecio());

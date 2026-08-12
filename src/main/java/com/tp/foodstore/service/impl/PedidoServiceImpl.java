@@ -1,5 +1,6 @@
 package com.tp.foodstore.service.impl;
 
+import com.tp.foodstore.dto.detallePedido.DetallePedidoCreate;
 import com.tp.foodstore.dto.pedido.PedidoDto;
 import com.tp.foodstore.dto.pedido.PedidoEdit;
 import com.tp.foodstore.entity.Pedido;
@@ -13,6 +14,7 @@ import com.tp.foodstore.repository.UsuarioRepository;
 import com.tp.foodstore.service.interfaces.PedidoService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,29 +44,35 @@ public class PedidoServiceImpl implements PedidoService {
                 .filter(u -> !u.isEliminado())
                 .orElseThrow(() -> new NegocioException("Usuario no encontrado con id " + dto.getUsuarioId()));
 
-        List<Producto> productos = dto.getDetalles().stream()
-                .map(detalle -> productoRepository.findById(detalle.getProductoId())
-                        .filter(p -> !p.isEliminado())
-                        .orElseThrow(() -> new NegocioException("Producto no encontrado con id " + detalle.getProductoId())))
-                .toList();
+        List<Producto> productos = new ArrayList<>();
+        for (DetallePedidoCreate detalle : dto.getDetalles()) {
+            Producto producto = productoRepository.findById(detalle.getProductoId())
+                    .filter(p -> !p.isEliminado())
+                    .orElseThrow(() -> new NegocioException("Producto no encontrado con id " + detalle.getProductoId()));
+            if (!producto.tieneStock(detalle.getCantidad())) {
+                throw new NegocioException("Stock insuficiente del producto " + producto.getNombre());
+            }
+            producto.descontarStock(detalle.getCantidad());
+            productoRepository.save(producto);
+            productos.add(producto);
+        }
 
         Pedido pedido = pedidoMapper.toEntity(dto, usuario, productos);
         pedido.calcularTotal();
         pedido = pedidoRepository.save(pedido);
-        return pedidoMapper.toDto(pedido, usuario.getId());
+        return pedidoMapper.toDto(pedido);
     }
 
     @Override
     public PedidoDto obtenerPorId(Long id) {
-        Pedido pedido = buscar(id);
-        return pedidoMapper.toDto(pedido, buscarUsuarioId(pedido));
+        return pedidoMapper.toDto(buscar(id));
     }
 
     @Override
     public List<PedidoDto> listar() {
         return pedidoRepository.findAll().stream()
                 .filter(pedido -> !pedido.isEliminado())
-                .map(pedido -> pedidoMapper.toDto(pedido, buscarUsuarioId(pedido)))
+                .map(pedidoMapper::toDto)
                 .toList();
     }
 
@@ -72,14 +80,5 @@ public class PedidoServiceImpl implements PedidoService {
         return pedidoRepository.findById(id)
                 .filter(pedido -> !pedido.isEliminado())
                 .orElseThrow(() -> new NegocioException("Pedido no encontrado con id " + id));
-    }
-
-    private Long buscarUsuarioId(Pedido pedido) {
-        return usuarioRepository.findAll().stream()
-                .filter(usuario -> !usuario.isEliminado())
-                .filter(usuario -> usuario.getPedidos().contains(pedido))
-                .map(Usuario::getId)
-                .findFirst()
-                .orElse(null);
     }
 }
