@@ -83,7 +83,7 @@ Con la aplicación corriendo:
 
 ## Probar el flujo del TP con Postman/curl
 
-En una base H2 nueva los ids empiezan en 1. Ejecutar los comandos en orden. También se puede importar la colección `postman/food-store-api.postman_collection.json` en Postman (File → Import) con todos los requests ya armados.
+En una base H2 nueva los ids empiezan en 1. Ejecutar los comandos en orden.
 
 ### 1) Crear 2 usuarios
 
